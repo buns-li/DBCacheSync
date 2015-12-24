@@ -17,6 +17,7 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.ideaLibSources/protostuff-xml-1.0.7-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.ideaLibSources/xstream-1.4.8-sources.jar!/" />
         </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>
@@ -31,5 +32,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="com.thoughtworks.xstream:xstream:1.4.8" level="project" />
   </component>
 </module>

@@ -1,8 +1,7 @@
 package utils;
 
-import com.dyuproject.protostuff.Schema;
-import com.dyuproject.protostuff.runtime.RuntimeSchema;
-import com.dyuproject.protostuff.*;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import java.io.*;
 
@@ -17,51 +16,57 @@ public class XmlUtils{
 
     /**
      * 序列化对象至Xml文件
-     * @param message
-     * @param filePath
-     * @param <T>
+     * @param message java bean对象
+     * @param filePath xml文件路径
+     * @param <T> 要进行序列化的java bean对象类型
      */
-    public static <T extends Object&Serializable> void serialize(T message,String filePath) throws IOException {
+    public static <T> void serialize(T message, String filePath) {
         if (filePath.isEmpty() || message == null) {
             return;
         }
-        Schema<T> msgSchema = (Schema<T>) RuntimeSchema.getSchema(message.getClass());
 
-        byte[] msgBytes = XmlIOUtil.toByteArray(message, msgSchema);
+        XStream xStream = new XStream(new DomDriver());
 
-        OutputStream out = new FileOutputStream(filePath);
+        xStream.processAnnotations(message.getClass()); //通过注解方式的，一定要有这句话
 
-        out.write(msgBytes);
+        try {
 
-        out.close();
+            OutputStream out = new FileOutputStream(filePath);
+
+            xStream.toXML(message, out);
+
+            out.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 将xml配置文件中的信息反序列化到对象中
-     * @param filePath
-     * @param <T>
-     * @return
+     * @param filePath xml文件路径地址
+     * @param <T> 要发序列化形成的对象类型
+     * @return java对象
      */
-    public static <T extends Object&Serializable> T deserialize(Class<T> tType,String filePath) throws IOException, IllegalAccessException, InstantiationException {
+    public static <T> T deserialize(Class<T> tType, String filePath) {
 
         if (filePath.isEmpty()) {
             return null;
         }
 
-        InputStream input = new FileInputStream(filePath);
+        try {
+            InputStream input = new FileInputStream(filePath);
 
-        int size = input.available();
+            XStream xStream = new XStream(new DomDriver());
 
-        byte[] bytes = new byte[size];
+            xStream.processAnnotations(tType);
 
-        input.read(bytes);
+            return (T) xStream.fromXML(input);
 
-        T instance = tType.newInstance();
+        } catch (IOException e) {
+            System.out.println(e);
+            return null;
+        }
 
-        Schema<T> msgSchema = RuntimeSchema.getSchema(tType);
-
-        XmlIOUtil.mergeFrom(bytes, instance, msgSchema);
-
-        return instance;
     }
 }

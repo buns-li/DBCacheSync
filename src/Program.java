@@ -1,6 +1,8 @@
+import core.PlatGlobal;
+import models.DbCacheConfigModel;
+import models.QueryLogicConfigModel;
 import servers.cacheServer.CacheServer;
 import servers.codeServer.CodeServer;
-import core.PlatGlobal;
 import servers.mqServer.MessageQueueServer;
 
 /**
@@ -22,8 +24,8 @@ public final class Program {
          */
 
         PlatGlobal.instance()
-                .preAnalysicConfig("config/queryLogic.xml")
-                .preAnalysicConfig("config/cacheDbConfig.xml");
+                .preAnalysicConfig("config/queryLogic.xml", QueryLogicConfigModel.class)
+                .preAnalysicConfig("config/cacheDbConfig.xml", DbCacheConfigModel.class);
 
         new CacheServer().run();
         new CodeServer().run();

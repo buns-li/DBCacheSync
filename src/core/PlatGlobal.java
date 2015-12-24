@@ -2,7 +2,8 @@ package core;
 
 import utils.XmlUtils;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.Properties;
  */
 public class PlatGlobal {
 
-    private Map<String, Object> configCaches;
+    private Map<Class<?>, Object> configCaches;
 
     /**
      * 用于存储当前服务的一些系统设置内容（主要数据来自于platform.properties文件中的配置信息)
@@ -36,16 +37,11 @@ public class PlatGlobal {
                 platformProperties.load(new FileReader(fileUrl.getFile()));
             } catch (IOException ex) {
                 ex.printStackTrace();
-                System.out.println(ex);
             }
         }
         if (configCaches == null) {
             configCaches = new HashMap<>();
         }
-    }
-
-    private static class SingletonHolder {
-        public final static PlatGlobal instance = new PlatGlobal();
     }
 
     public static PlatGlobal instance() {
@@ -55,24 +51,15 @@ public class PlatGlobal {
     /**
      * 获取系统设置存储对象
      *
-     * @return
+     * @return Properties
      */
     public Properties getPlatformConfig() {
         return platformProperties;
     }
 
     /**
-     * 获取系统配置项内容属性
-     * @return
-     */
-    public Map<String, Object> getConfigCaches() {
-        return configCaches;
-    }
-
-    /**
      * 获取项目根路径
-     *
-     * @return
+     * @return String
      */
     public String getProjectRootPath() {
         return projectRootPath;
@@ -80,15 +67,34 @@ public class PlatGlobal {
 
     /**
      * 预解析配置文件,并且加入全局的缓存对象中
-     *
      * @param configPath 配置文件地址
      */
-    public PlatGlobal preAnalysicConfig(String configPath) {
+    public <T extends IConfigPOBase> PlatGlobal preAnalysicConfig(String configPath, Class<T> source) {
         URL fileUrl = ClassLoader.getSystemResource(configPath);
 
         if (fileUrl == null) return this;
 
+        T instance = XmlUtils.deserialize(source, configPath);
+
+        if (instance != null) {
+            configCaches.put(source, instance);
+        }
+
         return this;
     }
 
+    /**
+     * 获取当前系统存储的缓存对象
+     *
+     * @param targetModel 配置对象的class
+     * @param <T>         具体对应的配置目标的类型
+     * @return 缓存模型对象
+     */
+    public <T extends IConfigPOBase> T getCacheModels(Class<T> targetModel) {
+        return (T) configCaches.get(targetModel);
+    }
+
+    private static class SingletonHolder {
+        public final static PlatGlobal instance = new PlatGlobal();
+    }
 }
