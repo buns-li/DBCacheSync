@@ -22,27 +22,27 @@ public class DbCacheTableColPO extends POBase {
         this.fromTb = fromTb;
     }
 
-    public String getFromTb() {
+    final public String getFromTb() {
         return fromTb;
     }
 
-    public String getFieldType() {
+    final public String getFieldType() {
         return fieldType;
     }
 
-    public String getName() {
+    final public String getName() {
         return name;
     }
 
-    public String getType() {
+    final public String getType() {
         return type;
     }
 
-    public Integer getIndex() {
+    final public Integer getIndex() {
         return index;
     }
 
-    public Integer getLength() {
+    final public Integer getLength() {
         return length;
     }
 }

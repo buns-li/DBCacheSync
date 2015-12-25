@@ -18,19 +18,15 @@ public class QueryLogicItemPO extends POBase {
         this.cmd = cmd;
     }
 
-    public String getKey() {
+    final public String getKey() {
         return key;
     }
 
-    public void setKey(String key) {
+    final public void setKey(String key) {
         this.key = key;
     }
 
-    public String getCmd() {
+    final public String getCmd() {
         return cmd;
-    }
-
-    public void setCmd(String cmd) {
-        this.cmd = cmd;
     }
 }

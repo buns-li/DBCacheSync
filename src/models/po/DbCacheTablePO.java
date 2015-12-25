@@ -35,23 +35,23 @@ public class DbCacheTablePO extends POBase {
         cols = new LinkedList<>();
     }
 
-    public String getKey() {
+    final public String getKey() {
         return key;
     }
 
-    public String getName() {
+    final public String getName() {
         return name;
     }
 
-    public String getSqlKey() {
+    final public String getSqlKey() {
         return sqlKey;
     }
 
-    public String getGetNewSqlKey() {
+    final public String getGetNewSqlKey() {
         return getNewSqlKey;
     }
 
-    public LinkedList<DbCacheTableColPO> getCols() {
+    final public LinkedList<DbCacheTableColPO> getCols() {
         return cols;
     }
 

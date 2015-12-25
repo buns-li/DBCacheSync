@@ -53,7 +53,7 @@ public class PlatGlobal {
      *
      * @return Properties
      */
-    public Properties getPlatformConfig() {
+    final public Properties getPlatformConfig() {
         return platformProperties;
     }
 
@@ -61,7 +61,7 @@ public class PlatGlobal {
      * 获取项目根路径
      * @return String
      */
-    public String getProjectRootPath() {
+    final public String getProjectRootPath() {
         return projectRootPath;
     }
 

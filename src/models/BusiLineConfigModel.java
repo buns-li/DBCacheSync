@@ -41,11 +41,11 @@ public class BusiLineConfigModel implements IConfigPOBase<BusiLinePO> {
         nodes = new HashMap<>();
     }
 
-    public Map<String, BusiLinePO.BusiLineParamPO> getParams() {
+    final public Map<String, BusiLinePO.BusiLineParamPO> getParams() {
         return params;
     }
 
-    public Map<String, BusiLinePO.BusiNodePO> getNodes() {
+    final public Map<String, BusiLinePO.BusiNodePO> getNodes() {
         return nodes;
     }
 
@@ -103,17 +103,16 @@ public class BusiLineConfigModel implements IConfigPOBase<BusiLinePO> {
 
         protected void populateMap(HierarchicalStreamReader reader, UnmarshallingContext context, Map map) {
             String key;
-            BusiLinePO.BusiLineParamPO queryLogicItemPO;
             while (reader.hasMoreChildren()) {
                 reader.moveDown();
                 key = reader.getAttribute("name");
 
-                queryLogicItemPO = new BusiLinePO.BusiLineParamPO(
-                        key,
-                        reader.getAttribute("in"),
-                        reader.getAttribute("out"),
-                        reader.getAttribute("type"));
-                map.put(key, queryLogicItemPO);
+                map.put(key,
+                        new BusiLinePO.BusiLineParamPO(
+                                key,
+                                reader.getAttribute("in"),
+                                reader.getAttribute("out"),
+                                reader.getAttribute("type")));
 
                 reader.moveUp();
             }

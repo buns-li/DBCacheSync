@@ -38,19 +38,19 @@ public class BusiLinePO extends POBase {
             this.out = out;
         }
 
-        public String getName() {
+        final public String getName() {
             return name;
         }
 
-        public String getType() {
+        final public String getType() {
             return type;
         }
 
-        public String getIn() {
+        final public String getIn() {
             return in;
         }
 
-        public String getOut() {
+        final public String getOut() {
             return out;
         }
     }
@@ -85,19 +85,19 @@ public class BusiLinePO extends POBase {
             this.type = type;
         }
 
-        public String getName() {
+        final public String getName() {
             return name;
         }
 
-        public String getId() {
+        final public String getId() {
             return id;
         }
 
-        public String getNext() {
+        final public String getNext() {
             return next;
         }
 
-        public String getType() {
+        final public String getType() {
             return type;
         }
     }
@@ -118,7 +118,7 @@ public class BusiLinePO extends POBase {
             return params;
         }
 
-        public String getId() {
+        final public String getId() {
             return id;
         }
     }
@@ -137,7 +137,7 @@ public class BusiLinePO extends POBase {
             conditions = new ArrayList<>();
         }
 
-        public ArrayList<CaseConditionPO> getConditions() {
+        final public ArrayList<CaseConditionPO> getConditions() {
             return conditions;
         }
     }
@@ -175,15 +175,15 @@ public class BusiLinePO extends POBase {
             this.symbol = symbol;
         }
 
-        public String getName() {
+        final public String getName() {
             return name;
         }
 
-        public String getValue() {
+        final public String getValue() {
             return value;
         }
 
-        public String getSymbol() {
+        final public String getSymbol() {
             return symbol;
         }
     }
