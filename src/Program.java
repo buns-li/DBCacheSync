@@ -1,6 +1,7 @@
 import core.PlatGlobal;
 import models.DbCacheConfigModel;
 import models.QueryLogicConfigModel;
+import org.apache.log4j.PropertyConfigurator;
 import servers.cacheServer.CacheServer;
 import servers.codeServer.CodeServer;
 import servers.mqServer.MessageQueueServer;
@@ -11,6 +12,11 @@ import servers.mqServer.MessageQueueServer;
 public final class Program {
 
     public static void main(String[] args) throws Exception{
+        /**
+         * 加载log4配置
+         */
+        PropertyConfigurator.configure(PlatGlobal.instance().getProjectRootPath() + "log4.properties");
+
         /**
          * 操作步骤
          *  1.启动創建緩存空間服务，createserver
