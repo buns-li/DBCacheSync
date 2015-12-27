@@ -1,11 +1,13 @@
 package servers.cacheServer;
 
-import core.ServerBase;
 import core.PlatGlobal;
-import servers.mqServer.MessageQueueServer;
+import core.ServerBase;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
-import servers.cacheServer.processors.*;
+import servers.cacheServer.processors.DeleteProcessor;
+import servers.cacheServer.processors.InsertProcessor;
+import servers.cacheServer.processors.UpdateProcessor;
+import servers.mqServer.MessageQueueServer;
 
 import java.util.Properties;
 
@@ -39,5 +41,6 @@ public class CacheServer extends ServerBase {
         System.out.println("CacheServer Complete registering the routeKey processor in MessageQueueServer！\n");
 
         //获取数据库数据并存入缓存
+
     }
 }
