@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<db>
+    <tables>
+        <table key="t1" name="t_busi_app" sqlKey="cache:app-query" getNewSqlKey="cache:app-update">
+            <cols>
+                <col name="id" index="0" length="12" type="string" fieldType="pk"/>
+                <col name="name" index="1" length="25" type="string"/>
+                <col name="pkid" index="2" length="12" type="string" fieldType="fk" fromTb="t2"/>
+            </cols>
+        </table>
+    </tables>
+</db>
+

@@ -1,0 +1,7 @@
+<querylogic>
+    <sqls>
+        <sql key="cache:app-query">
+            <cmd>select * from t_busi_app;</cmd>
+        </sql>
+    </sqls>
+</querylogic>
