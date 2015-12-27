@@ -34,5 +34,8 @@
     </orderEntry>
     <orderEntry type="library" name="com.thoughtworks.xstream:xstream:1.4.8" level="project" />
     <orderEntry type="library" name="log4j-1.2.16" level="project" />
+    <orderEntry type="library" name="mysql-connector-java-5.1.22-bin" level="project" />
+    <orderEntry type="library" name="gson-2.1" level="project" />
+    <orderEntry type="library" name="org.apache.tomcat:tomcat-jdbc:9.0.0.M1" level="project" />
   </component>
 </module>
