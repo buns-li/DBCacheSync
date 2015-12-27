@@ -1,46 +1,48 @@
 package dao;
 
-import dao.po.DIO;
-import dao.po.SmartStruct;
+import dao.po.DBParam;
 
-import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by buns on 12/25/15.
  */
-public interface IDbAccess {
+public interface IDbAccess<T> {
     /**
      * 执行数据查询
      *
-     * @param dio
-     * @param <T>
+     * @param sql
+     * @param dbParamses
      * @return
      */
-    <T extends SmartStruct & ResultSet> T query(DIO dio);
+    T query(String sql, DBParam[] dbParamses);
 
     /**
      * 执行数据操作
      * 新增、修改、删除
      *
-     * @param dio
+     * @param sql
+     * @param dbParamses
      * @return
      */
-    int exec(DIO dio);
+    int exec(String sql, DBParam[] dbParamses);
 
     /**
      * 批量执行多个不同表不同操作的数据操作
      * 新增、修改、删除
      *
-     * @param dios
+     * @param sqls
      * @return
      */
-    int batchExec(DIO... dios);
+    int batchExec(Map<String, DBParam[]> sqls);
 
     /**
      * 批量执行单表的新增、修改、删除
      *
-     * @param dio
+     * @param sql
+     * @param listDbParams
      * @return
      */
-    int repeatBatchExec(DIO dio);
+    int repeatBatchExec(String sql, ArrayList<DBParam[]> listDbParams);
 }

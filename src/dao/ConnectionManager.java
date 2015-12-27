@@ -18,31 +18,46 @@ import java.util.Properties;
  * Created by buns on 12/26/15.
  * 数据库连接对象管理
  */
-public class ConnectionManager {
-
-    private static Map<EDriverType, Properties> properiesMap = new HashMap<>();
+public final class ConnectionManager {
     /**
      * 线程内共享Connection，ThreadLocal通常是全局的，支持泛型
      */
-    private static ThreadLocal<ConnectionMap> threadLocal = new ThreadLocal<>();
+    private static ThreadLocal<DataSourceMap> threadLocal = new ThreadLocal<>();
 
-    static {
-        Properties properties;
-        properiesMap.put(EDriverType.MYSQL, properties = new Properties());
-        URL fileUrl = ClassLoader.getSystemResource("mysql-pool.properties");
+    /**
+     * 注册缓存
+     *
+     * @param driverType
+     * @param poolConfigPath
+     */
+    public static void registerDataSource(EDriverType driverType, String poolConfigPath) {
+        DataSourceMap dataSourceMap = new DataSourceMap();
+        dataSourceMap.setDs(driverType, createDataSourceFromProperties(poolConfigPath));
+        threadLocal.set(dataSourceMap);
+    }
+
+    /**
+     * 构建DataSource从配置文件中
+     *
+     * @param poolConfigPath
+     * @return
+     */
+    private static DataSource createDataSourceFromProperties(String poolConfigPath) {
+
+        Properties properties = new Properties();
+
+        URL fileUrl = ClassLoader.getSystemResource(poolConfigPath);
+
         try {
             properties.load(new FileReader(fileUrl.getFile()));
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-    private static Connection createConnectionFromProperties(EDriverType eDriverType) {
-        Properties properties = properiesMap.get(eDriverType);
         PoolProperties p = new PoolProperties();
         p.setUrl(String.format(properties.getProperty("url"),
                 properties.getProperty("host"),
-                properties.getProperty("port"),
+                Integer.parseInt(properties.getProperty("port")),
                 properties.getProperty("database")));
 
         p.setUsername(properties.getProperty("userName"));
@@ -79,12 +94,7 @@ public class ConnectionManager {
         DataSource datasource = new DataSource();
         datasource.setPoolProperties(p);
 
-        try {
-            return datasource.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return datasource;
     }
 
     /**
@@ -95,18 +105,15 @@ public class ConnectionManager {
      */
     public static Connection getConnection(EDriverType eDriverType) {
         Connection conn = null;
-        // 获取当前线程内共享的ConnectionMap
-        ConnectionMap conMap = threadLocal.get();
+        // 获取当前线程内共享的DataSourceMap
+        DataSourceMap dsMap = threadLocal.get();
         try {
-            if (conMap == null) {
-                conMap = new ConnectionMap();
-                conn = createConnectionFromProperties(eDriverType);
-                threadLocal.set(conMap);
-            } else {
-                conn = conMap.getConn(eDriverType);
+            if (dsMap != null) {
+                conn = dsMap.getDs(EDriverType.MYSQL).getConnection();
             }
         } catch (Exception e) {
             // 异常处理
+            e.printStackTrace();
         }
         return conn;
     }
@@ -114,20 +121,12 @@ public class ConnectionManager {
     /**
      * 关闭当前数据库连接
      */
-    public static void close(EDriverType eDriverType) {
-        Connection conn;
-        // 获取当前线程内共享的ConnectionMap
-        ConnectionMap connMap = threadLocal.get();
+    public static void close(Connection conn) {
         try {
-
-            if (connMap != null) {
-                conn = connMap.getConn(eDriverType);
-                // 判断是否已经关闭
-                if (conn != null && !conn.isClosed()) {
-                    // 关闭资源
-                    conn.close();
-                    connMap.setConn(eDriverType, null);
-                }
+            // 判断是否已经关闭
+            if (conn != null && !conn.isClosed()) {
+                // 关闭资源
+                conn.close();
             }
         } catch (SQLException e) {
             // 异常处理
@@ -138,23 +137,18 @@ public class ConnectionManager {
     /**
      * 事务回滚
      *
-     * @param eDriverType
+     * @param conn
      * @param savepoint
      */
-    public static void rollback(EDriverType eDriverType, Savepoint savepoint) {
-        Connection conn;
-        // 获取当前线程内共享的ConnectionMap
-        ConnectionMap connMap = threadLocal.get();
+    public static void rollback(Connection conn, Savepoint savepoint) {
         try {
-            if (connMap != null) {
-                conn = connMap.getConn(eDriverType);
-                // 判断是否已经关闭
-                if (conn != null && !conn.isClosed()) {
-                    if (savepoint != null) {
-                        conn.rollback(savepoint);
-                    } else {
-                        conn.rollback();
-                    }
+            // 判断是否已经关闭
+            if (conn != null && !conn.isClosed()) {
+                if (savepoint != null) {
+                    conn.rollback(savepoint);
+                } else {
+                    // 关闭资源
+                    conn.rollback();
                 }
             }
         } catch (SQLException e) {
@@ -163,19 +157,19 @@ public class ConnectionManager {
         }
     }
 
-    final static class ConnectionMap {
-        private static Map<EDriverType, Connection> cons;
+    final static class DataSourceMap {
+        private static Map<EDriverType, DataSource> dataSourceMap;
 
         static {
-            cons = new HashMap<>(3);
+            dataSourceMap = new HashMap<>(3);
         }
 
-        public Connection getConn(EDriverType eDriverType) {
-            return cons.get(eDriverType);
+        public DataSource getDs(EDriverType eDriverType) {
+            return dataSourceMap.get(eDriverType);
         }
 
-        public void setConn(EDriverType eDriverType, Connection connection) {
-            cons.put(eDriverType, connection);
+        public void setDs(EDriverType eDriverType, DataSource ds) {
+            dataSourceMap.put(eDriverType, ds);
         }
     }
 }

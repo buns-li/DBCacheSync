@@ -3,11 +3,11 @@ package dao.po;
 /**
  * Created by buns on 12/27/15.
  */
-public final class DBParams {
+public final class DBParam {
     private EParamType paramType;
     private Object value;
 
-    public DBParams(EParamType paramType, Object value) {
+    public DBParam(EParamType paramType, Object value) {
         this.paramType = paramType;
         this.value = value;
     }

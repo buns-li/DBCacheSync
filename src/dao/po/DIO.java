@@ -1,6 +1,6 @@
 package dao.po;
 
-import com.sun.tools.javac.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by buns on 12/26/15.
@@ -11,9 +11,9 @@ public final class DIO {
 
     private String sql;
 
-    private DBParams[] params;
+    private DBParam[] params;
 
-    private List<DBParams[]> listParams;
+    private ArrayList<DBParam[]> listParams;
 
     public String getTableName() {
         return tableName;
@@ -31,19 +31,19 @@ public final class DIO {
         this.sql = sql;
     }
 
-    public DBParams[] getParams() {
+    public DBParam[] getParams() {
         return params;
     }
 
-    public void setParams(DBParams[] params) {
+    public void setParams(DBParam[] params) {
         this.params = params;
     }
 
-    public List<DBParams[]> getListParams() {
+    public ArrayList<DBParam[]> getListParams() {
         return listParams;
     }
 
-    public void setListParams(List<DBParams[]> listParams) {
+    public void setListParams(ArrayList<DBParam[]> listParams) {
         this.listParams = listParams;
     }
 }

@@ -1,35 +1,57 @@
 package dao;
 
-import dao.po.DBParams;
-import dao.po.DIO;
+import dao.converter.IResultSetConverter;
+import dao.converter.impl.SmartStructConverter;
+import dao.po.DBParam;
 import dao.po.EDriverType;
-import dao.po.SmartStruct;
 
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by buns on 12/25/15.
  */
-public abstract class BaseDbAccess implements IDbAccess {
+public abstract class BaseDbAccess<T> implements IDbAccess<T> {
 
+    private static IResultSetConverter DEFAULT_CONVERTER = new SmartStructConverter();
     protected Connection connection;
-
     private EDriverType eDriverType;
-
     private int batchSize;
+    private IResultSetConverter resultSetConverter;
 
     protected BaseDbAccess(EDriverType eDriverType) {
-        this(eDriverType, 1000);
+        this(eDriverType, 1000, DEFAULT_CONVERTER);
+    }
+
+    protected BaseDbAccess(EDriverType eDriverType, IResultSetConverter resultSetConverter) {
+        this(eDriverType, 1000, resultSetConverter);
     }
 
     protected BaseDbAccess(EDriverType eDriverType, int batchSize) {
-        this.eDriverType = eDriverType;
-        this.batchSize = batchSize;
+        this(eDriverType, batchSize, DEFAULT_CONVERTER);
     }
 
-    private static void setValueToPreparedStatement(PreparedStatement ps, Integer index, DBParams param) {
+    protected BaseDbAccess(EDriverType eDriverType, int batchSize, IResultSetConverter resultSetConverter) {
+        this.eDriverType = eDriverType;
+        this.batchSize = batchSize;
+        this.resultSetConverter = resultSetConverter == null ? DEFAULT_CONVERTER : resultSetConverter;
+
+//        Type genType = getClass().getGenericSuperclass();
+//        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+//        entityClass = (Class) params[0];
+    }
+
+    /**
+     * 预编译语句的参数赋值
+     *
+     * @param ps
+     * @param index
+     * @param param
+     */
+    private static void setValueToPreparedStatement(PreparedStatement ps, Integer index, DBParam param) {
         try {
             Object value = param.getValue();
             switch (param.getParamType()) {
@@ -108,22 +130,28 @@ public abstract class BaseDbAccess implements IDbAccess {
         }
     }
 
-    public abstract <T extends SmartStruct & ResultSet> T doResultSetRowConvert(ResultSet set);
+    protected abstract void eachResultSet(ResultSet set);
 
+    /**
+     * 执行数据查询
+     *
+     * @param sql
+     * @param dbParams
+     * @return
+     */
     @Override
-    public <T extends SmartStruct & ResultSet> T query(DIO dio) {
+    public T query(String sql, DBParam[] dbParams) {
         connection = ConnectionManager.getConnection(eDriverType);
         PreparedStatement preparedStatement = null;
         ResultSet set = null;
         try {
-            preparedStatement = connection.prepareStatement(dio.getSql(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
             preparedStatement.setFetchSize(Integer.MIN_VALUE);
-            DBParams[] params = dio.getParams();
-            for (int i = 0, l = params.length; i < l; i++) {
-                setValueToPreparedStatement(preparedStatement, i, params[i]);
+            for (int i = 0, l = dbParams.length; i < l; i++) {
+                setValueToPreparedStatement(preparedStatement, i + 1, dbParams[i]);
             }
             set = preparedStatement.executeQuery();
-            return doResultSetRowConvert(set);
+            return (T) resultSetConverter.convert(set);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -138,72 +166,127 @@ public abstract class BaseDbAccess implements IDbAccess {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            ConnectionManager.close(eDriverType);
+            ConnectionManager.close(connection);
         }
     }
 
+    /**
+     * 将查询出来的ResultSet进行行遍历读取
+     *
+     * @param sql
+     * @param dbParams
+     */
+    public void eachQuery(String sql, DBParam[] dbParams) {
+        connection = ConnectionManager.getConnection(eDriverType);
+        PreparedStatement preparedStatement = null;
+        ResultSet set = null;
+        try {
+            preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            for (int i = 0, l = dbParams.length; i < l; i++) {
+                setValueToPreparedStatement(preparedStatement, i + 1, dbParams[i]);
+            }
+            set = preparedStatement.executeQuery();
+            eachResultSet(set);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (set != null) {
+                    set.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            ConnectionManager.close(connection);
+        }
+    }
+
+    /**
+     * 执行数据操作
+     * 新增、修改、删除
+     *
+     * @param sql
+     * @param dbParams
+     * @return
+     */
     @Override
-    public int exec(DIO dio) {
+    public int exec(String sql, DBParam[] dbParams) {
         connection = ConnectionManager.getConnection(eDriverType);
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(dio.getSql());
-            preparedStatement.setFetchSize(Integer.MIN_VALUE);
-            DBParams[] params = dio.getParams();
-            for (int i = 0, l = params.length; i < l; i++) {
-                setValueToPreparedStatement(preparedStatement, i, params[i]);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            for (int i = 0, l = dbParams.length; i < l; i++) {
+                setValueToPreparedStatement(preparedStatement, i + 1, dbParams[i]);
             }
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            return -1;
         } finally {
-            ConnectionManager.close(eDriverType);
+            ConnectionManager.close(connection);
         }
-        return -1;
     }
 
+    /**
+     * 批量执行多个不同表不同操作的数据操作
+     * 新增、修改、删除
+     *
+     * @param sqls
+     * @return
+     */
     @Override
-    public int batchExec(DIO... dios) {
+    public int batchExec(Map<String, DBParam[]> sqls) {
         connection = ConnectionManager.getConnection(eDriverType);
         try {
             PreparedStatement ps;
-            DBParams[] params;
-
+            DBParam[] params;
             connection.setAutoCommit(false);
-
-            for (int i = 0, l = dios.length, j, l2; i < l; i++) {
-                ps = connection.prepareStatement(dios[i].getSql());
-                params = dios[i].getParams();
+            int j, l2;
+            Map.Entry<String, DBParam[]> dio;
+            for (Iterator iterator = sqls.entrySet().iterator(); iterator.hasNext(); ) {
+                dio = (Map.Entry<String, DBParam[]>) iterator.next();
+                ps = connection.prepareStatement(dio.getKey());
+                params = dio.getValue();
                 for (j = 0, l2 = params.length; j < l2; j++) {
-                    setValueToPreparedStatement(ps, j, params[j]);
+                    setValueToPreparedStatement(ps, j + 1, params[j]);
                 }
                 ps.executeUpdate();
             }
             connection.commit();
+            return sqls.size();
         } catch (SQLException e) {
-            ConnectionManager.rollback(eDriverType, null);
+            ConnectionManager.rollback(connection, null);
             e.printStackTrace();
+            return -1;
         } finally {
-            ConnectionManager.close(eDriverType);
+            ConnectionManager.close(connection);
         }
-        return -1;
     }
 
+    /**
+     * 批量执行单表的新增、修改、删除
+     *
+     * @param sql
+     * @param listDbParams
+     * @return
+     */
     @Override
-    public int repeatBatchExec(DIO dio) {
+    public int repeatBatchExec(String sql, ArrayList<DBParam[]> listDbParams) {
         connection = ConnectionManager.getConnection(eDriverType);
         try {
             connection.setAutoCommit(false);
-            PreparedStatement ps = connection.prepareStatement(dio.getSql());
+            PreparedStatement ps = connection.prepareStatement(sql);
 
-            List<DBParams[]> dbParamses = dio.getListParams();
-
-            int i = 0, l = dbParamses.size(), j, l2;
-            DBParams[] dbParams;
+            int i = 0, l = listDbParams.size(), j, l2;
+            DBParam[] dbParams;
 
             for (; i < l; i++) {
-                dbParams = dbParamses.get(i);
+                dbParams = listDbParams.get(i);
                 for (j = 0, l2 = dbParams.length; j < l2; j++) {
-                    setValueToPreparedStatement(ps, i, dbParams[j]);
+                    setValueToPreparedStatement(ps, j + 1, dbParams[j]);
                 }
                 ps.addBatch();
                 if ((i + 1) % batchSize == 0) {
@@ -215,12 +298,13 @@ public abstract class BaseDbAccess implements IDbAccess {
                 ps.executeBatch();
                 connection.commit();
             }
+            return 1;
         } catch (SQLException e) {
-            ConnectionManager.rollback(eDriverType, null);
+            ConnectionManager.rollback(connection, null);
             e.printStackTrace();
+            return -1;
         } finally {
-            ConnectionManager.close(eDriverType);
+            ConnectionManager.close(connection);
         }
-        return -1;
     }
 }
