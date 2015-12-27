@@ -15,7 +15,7 @@ public final class Program {
         /**
          * 加载log4配置
          */
-        PropertyConfigurator.configure(PlatGlobal.instance().getProjectRootPath() + "log4.properties");
+        PropertyConfigurator.configure(PlatGlobal.instance().getProjectRootPath() + "/sysConfig/log4.properties");
 
         /**
          * 操作步骤

@@ -2,6 +2,9 @@ package servers.codeServer;
 
 import core.ServerBase;
 import servers.codeServer.processors.CopyProcessor;
+import servers.codeServer.processors.CreateLineProcessor;
+import servers.codeServer.processors.CreateNodeProcessor;
+import servers.codeServer.processors.ExportProcessor;
 import servers.mqServer.MessageQueueServer;
 
 /**
@@ -18,8 +21,9 @@ public class CodeServer extends ServerBase {
         System.out.println("CodeServer begin running...");
 
         System.out.println("CodeServer begin registering the routeKey processor in MessageQueueServer！");
-        MessageQueueServer.registerRoute("code.create", new CreateProcessor());
-        MessageQueueServer.registerRoute("code.export", new CreateProcessor());
+        MessageQueueServer.registerRoute("code.createNode", new CreateNodeProcessor());
+        MessageQueueServer.registerRoute("code.createLine", new CreateLineProcessor());
+        MessageQueueServer.registerRoute("code.export", new ExportProcessor());
         MessageQueueServer.registerRoute("test.result", new CopyProcessor());
         System.out.println("CodeServer Complete registering the routeKey processor in MessageQueueServer！");
 
