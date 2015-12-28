@@ -14,8 +14,8 @@ public final class SmartStruct {
     private List<String[]> rows;
 
     public SmartStruct() {
-        cols = new HashMap<String, Integer>();
-        rows = new LinkedList<String[]>();
+        cols = new HashMap<>();
+        rows = new LinkedList<>();
     }
 
     final public Map<String, Integer> getCols() {

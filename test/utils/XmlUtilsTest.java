@@ -105,7 +105,6 @@ public class XmlUtilsTest extends TestCase {
 
         System.out.println(dbCacheConfigModel.find("t2").getName());
 
-
         BusiLineConfigModel busiLineConfigModel = XmlUtils.deserialize(BusiLineConfigModel.class, testRootPath + "test3.xml");
 
         for (Iterator iterator = busiLineConfigModel.getParams().entrySet().iterator(); iterator.hasNext(); ) {

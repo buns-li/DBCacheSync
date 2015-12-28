@@ -21,7 +21,7 @@ import java.util.Properties;
  */
 public class MessageQueueServer extends ServerBase {
 
-    private static Map<String, Processor> EVENTS = new HashMap<String, Processor>();
+    private static Map<String, Processor> EVENTS = new HashMap<>();
 
     /**
      * 注册一个消息队列的路由处理
