@@ -93,12 +93,15 @@ public class QueryLogicConfigModel implements IConfigPOBase<QueryLogicItemPO> {
         protected void populateMap(HierarchicalStreamReader reader, UnmarshallingContext context, Map map) {
             while (reader.hasMoreChildren()) {
                 reader.moveDown();
+
                 String key = reader.getAttribute("key");
                 QueryLogicItemPO queryLogicItemPO;
                 while (reader.hasMoreChildren()) {
                     reader.moveDown();
+                    System.out.println(reader.getValue());
                     queryLogicItemPO = new QueryLogicItemPO(key, reader.getValue());
                     map.put(key, queryLogicItemPO);
+                    reader.moveUp();
                 }
                 reader.moveUp();
             }

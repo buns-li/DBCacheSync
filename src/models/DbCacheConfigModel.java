@@ -125,6 +125,7 @@ public class DbCacheConfigModel implements IConfigPOBase<DbCacheTablePO> {
                                 reader.getAttribute("fromTb")
                         ));
                     }
+                    reader.moveUp();
                 }
                 reader.moveUp();
             }
