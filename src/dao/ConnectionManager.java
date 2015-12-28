@@ -161,7 +161,7 @@ public final class ConnectionManager {
         private static Map<EDriverType, DataSource> dataSourceMap;
 
         static {
-            dataSourceMap = new HashMap<EDriverType, DataSource>(3);
+            dataSourceMap = new HashMap<>(3);
         }
 
         public DataSource getDs(EDriverType eDriverType) {

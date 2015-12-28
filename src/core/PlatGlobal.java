@@ -74,7 +74,7 @@ public class PlatGlobal {
 
         if (fileUrl == null) return this;
 
-        T instance = XmlUtils.deserialize(source, configPath);
+        T instance = XmlUtils.deserialize(source, fileUrl.getPath());
 
         if (instance != null) {
             configCaches.put(source, instance);

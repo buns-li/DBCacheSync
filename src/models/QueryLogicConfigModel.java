@@ -24,7 +24,7 @@ import java.util.Map;
 public class QueryLogicConfigModel implements IConfigPOBase<QueryLogicItemPO> {
 
     @XStreamConverter(MapFieldConverter.class)
-    private Map<String, QueryLogicItemPO> sqls = new HashMap<String, QueryLogicItemPO>();
+    private Map<String, QueryLogicItemPO> sqls = new HashMap<>();
 
     /**
      * 添加查询逻辑项
