@@ -1,7 +1,9 @@
 package dao;
 
+import dao.converter.IResultSetConverter;
 import dao.po.DBParam;
 
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -9,14 +11,23 @@ import java.util.Map;
  * Created by buns on 12/25/15.
  */
 public interface IDbAccess<T> {
+
     /**
      * 执行数据查询
-     *
      * @param sql
-     * @param dbParamses
+     * @param dbParams
      * @return
      */
-    T query(String sql, DBParam[] dbParamses);
+    ResultSet query(String sql, DBParam[] dbParams);
+
+    /**
+     * 执行数据查询(数据结果可以自定义实现转换)
+     * @param sql
+     * @param dbParamses
+     * @param resultSetConverter
+     * @return
+     */
+    T query(String sql, DBParam[] dbParamses, IResultSetConverter<T> resultSetConverter);
 
     /**
      * 执行数据操作
