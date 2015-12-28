@@ -20,7 +20,7 @@ public class SmartStructConverter implements IResultSetConverter<SmartStruct> {
     @Override
     public SmartStruct convert(ResultSet resultSet) {
 
-        ResultSetMetaData metaData = null;
+        ResultSetMetaData metaData;
         try {
             metaData = resultSet.getMetaData();
 

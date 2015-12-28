@@ -25,7 +25,7 @@ import java.util.Map;
 public class DbCacheConfigModel implements IConfigPOBase<DbCacheTablePO> {
 
     @XStreamConverter(MapFieldConverter.class)
-    private Map<String, DbCacheTablePO> tables = new HashMap<>();
+    private Map<String, DbCacheTablePO> tables = new HashMap<String, DbCacheTablePO>();
 
     /**
      * 添加查询逻辑项

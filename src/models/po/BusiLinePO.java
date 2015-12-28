@@ -111,7 +111,7 @@ public class BusiLinePO extends POBase {
 
         public NodeSqlKeyPO(String id) {
             this.id = id;
-            params = new ArrayList<>();
+            params = new ArrayList<BusiLineParamPO>();
         }
 
         public ArrayList<BusiLineParamPO> getParams() {
@@ -134,7 +134,7 @@ public class BusiLinePO extends POBase {
 
         public SwitchCasePO(String next) {
             this.next = next;
-            conditions = new ArrayList<>();
+            conditions = new ArrayList<CaseConditionPO>();
         }
 
         final public ArrayList<CaseConditionPO> getConditions() {

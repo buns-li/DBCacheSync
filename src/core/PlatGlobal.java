@@ -40,7 +40,7 @@ public class PlatGlobal {
             }
         }
         if (configCaches == null) {
-            configCaches = new HashMap<>();
+            configCaches = new HashMap<Class<?>, Object>();
         }
     }
 

@@ -1,9 +1,12 @@
 package servers.mqServer;
 
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.QueueingConsumer;
 import core.PlatGlobal;
-import core.ServerBase;
 import core.Processor;
+import core.ServerBase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +21,17 @@ import java.util.Properties;
  */
 public class MessageQueueServer extends ServerBase {
 
-    private static Map<String, Processor> EVENTS = new HashMap<>();
+    private static Map<String, Processor> EVENTS = new HashMap<String, Processor>();
+
+    /**
+     * 注册一个消息队列的路由处理
+     *
+     * @param key
+     * @param pro
+     */
+    public static final void registerRoute(String key, Processor pro) {
+        EVENTS.put(key, pro);
+    }
 
     @Override
     public void run() throws Exception{
@@ -74,14 +87,5 @@ public class MessageQueueServer extends ServerBase {
             }
         }
 
-    }
-
-    /**
-     * 注册一个消息队列的路由处理
-     * @param key
-     * @param pro
-     */
-    public static final void registerRoute(String key, Processor pro){
-        EVENTS.put(key, pro);
     }
 }

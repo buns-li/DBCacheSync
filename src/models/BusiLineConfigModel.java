@@ -37,8 +37,8 @@ public class BusiLineConfigModel implements IConfigPOBase<BusiLinePO> {
     private Map<String, BusiLinePO.BusiNodePO> nodes;
 
     public BusiLineConfigModel() {
-        params = new HashMap<>();
-        nodes = new HashMap<>();
+        params = new HashMap<String, BusiLinePO.BusiLineParamPO>();
+        nodes = new HashMap<String, BusiLinePO.BusiNodePO>();
     }
 
     final public Map<String, BusiLinePO.BusiLineParamPO> getParams() {
@@ -224,7 +224,7 @@ public class BusiLineConfigModel implements IConfigPOBase<BusiLinePO> {
                     reader.moveDown();
                     if ((type == null || type.isEmpty() || type == "normal") && reader.getNodeName() == "sql") {
                         sqlKeyPO = new BusiLinePO.NodeSqlKeyPO(reader.getAttribute("id"));
-                        nodePO.sqlkeys = new ArrayList<>();
+                        nodePO.sqlkeys = new ArrayList<BusiLinePO.NodeSqlKeyPO>();
                         nodePO.sqlkeys.add(sqlKeyPO);
                         while (reader.hasMoreChildren()) {
                             reader.moveDown();
@@ -237,7 +237,7 @@ public class BusiLineConfigModel implements IConfigPOBase<BusiLinePO> {
                         }
                     } else if (nodePO.getType() == "switch" && reader.getNodeName() == "case") {
                         switchCasePO = new BusiLinePO.SwitchCasePO(reader.getAttribute("next"));
-                        nodePO.cases = new ArrayList<>();
+                        nodePO.cases = new ArrayList<BusiLinePO.SwitchCasePO>();
                         nodePO.cases.add(switchCasePO);
                         while (reader.hasMoreChildren()) {
                             reader.moveDown();

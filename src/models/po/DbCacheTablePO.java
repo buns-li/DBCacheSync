@@ -32,7 +32,7 @@ public class DbCacheTablePO extends POBase {
         this.name = name;
         this.sqlKey = sqlKey;
         this.getNewSqlKey = getNewSqlKey;
-        cols = new LinkedList<>();
+        cols = new LinkedList<DbCacheTableColPO>();
     }
 
     final public String getKey() {
