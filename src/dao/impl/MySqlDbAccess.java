@@ -18,16 +18,20 @@ public final class MySqlDbAccess extends BaseDbAccess<SmartStruct> {
         ConnectionManager.registerDataSource(EDriverType.MYSQL, "mysql-pool.properties");
     }
 
-    public MySqlDbAccess(EDriverType eDriverType) {
-        super(eDriverType);
+    private MySqlDbAccess() {
+        super(EDriverType.MYSQL);
     }
 
-    public MySqlDbAccess(EDriverType eDriverType, int batchSize) {
-        super(eDriverType, batchSize);
+    public static MySqlDbAccess getInstance() {
+        return SingletonHolder.instance;
     }
 
     @Override
     protected void eachResultSet(ResultSet set) {
 
+    }
+
+    private static class SingletonHolder {
+        public final static MySqlDbAccess instance = new MySqlDbAccess();
     }
 }
