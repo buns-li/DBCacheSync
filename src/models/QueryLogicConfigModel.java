@@ -21,14 +21,13 @@ import java.util.Map;
  * Created by buns on 12/24/15.
  */
 @XStreamAlias("querylogic")
-public class QueryLogicConfigModel implements IConfigPOBase<QueryLogicItemPO> {
+public final class QueryLogicConfigModel implements IConfigPOBase<QueryLogicItemPO> {
 
     @XStreamConverter(MapFieldConverter.class)
     private Map<String, QueryLogicItemPO> sqls = new HashMap<>();
 
     /**
      * 添加查询逻辑项
-     *
      * @param key
      * @param cmd
      */
@@ -40,12 +39,6 @@ public class QueryLogicConfigModel implements IConfigPOBase<QueryLogicItemPO> {
     public QueryLogicItemPO find(String key) {
         return sqls.get(key);
     }
-
-    @Override
-    public QueryLogicItemPO findAll(Map<String, String> conditions) {
-        return null;
-    }
-
 
     /**
      * 针对Map对象的xml转换容器
@@ -99,6 +92,7 @@ public class QueryLogicConfigModel implements IConfigPOBase<QueryLogicItemPO> {
                     reader.moveDown();
                     queryLogicItemPO = new QueryLogicItemPO(key, reader.getValue());
                     map.put(key, queryLogicItemPO);
+                    reader.moveUp();
                 }
                 reader.moveUp();
             }

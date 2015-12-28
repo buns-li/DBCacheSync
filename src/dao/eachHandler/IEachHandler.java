@@ -1,6 +1,7 @@
 package dao.eachHandler;
 
 import java.sql.ResultSet;
+import java.util.Map;
 
 /**
  * Created by buns on 12/28/15.
@@ -12,6 +13,7 @@ public interface IEachHandler {
      * 遍历每一行的ResultSet数据
      *
      * @param resultSet
+     * @param colMap
      */
-    void each(ResultSet resultSet);
+    void each(ResultSet resultSet, Map<String, Integer> colMap, Integer rowIndex);
 }

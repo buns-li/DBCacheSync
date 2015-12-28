@@ -10,6 +10,7 @@ import dao.po.EDriverType;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -217,8 +218,15 @@ public abstract class BaseDbAccess<T> implements IDbAccess<T> {
                 setValueToPreparedStatement(preparedStatement, i + 1, dbParams[i]);
             }
             set = preparedStatement.executeQuery();
+            ResultSetMetaData metaData = set.getMetaData();
+            Integer columnCount = metaData.getColumnCount();
+            Map<String, Integer> colMap = new HashMap<>();
+            for (int i = 0; i < columnCount; i++) {
+                colMap.put(metaData.getColumnName(i + 1), i);
+            }
+            int i = 0;
             while (set.next()) {
-                eachHandler.each(set);
+                eachHandler.each(set, colMap, i++);
             }
         } catch (SQLException e) {
             e.printStackTrace();

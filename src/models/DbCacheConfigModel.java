@@ -22,7 +22,7 @@ import java.util.Map;
  * Created by buns on 12/24/15.
  */
 @XStreamAlias("db")
-public class DbCacheConfigModel implements IConfigPOBase<DbCacheTablePO> {
+public final class DbCacheConfigModel implements IConfigPOBase<DbCacheTablePO> {
 
     @XStreamConverter(MapFieldConverter.class)
     private Map<String, DbCacheTablePO> tables = new HashMap<>();
@@ -39,9 +39,8 @@ public class DbCacheConfigModel implements IConfigPOBase<DbCacheTablePO> {
         return tables.get(key);
     }
 
-    @Override
-    public DbCacheTablePO findAll(Map<String, String> conditions) {
-        return null;
+    public Map<String, DbCacheTablePO> getAll() {
+        return tables;
     }
 
     /**
@@ -92,7 +91,6 @@ public class DbCacheConfigModel implements IConfigPOBase<DbCacheTablePO> {
                     writer.endNode();
                 }
                 writer.endNode();
-
                 writer.endNode();
             }
         }
@@ -125,6 +123,7 @@ public class DbCacheConfigModel implements IConfigPOBase<DbCacheTablePO> {
                                 reader.getAttribute("fromTb")
                         ));
                     }
+                    reader.moveUp();
                 }
                 reader.moveUp();
             }

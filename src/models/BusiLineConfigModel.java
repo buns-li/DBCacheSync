@@ -19,7 +19,7 @@ import java.util.*;
  * Created by buns on 12/25/15.
  */
 @XStreamAlias("line")
-public class BusiLineConfigModel implements IConfigPOBase<BusiLinePO> {
+public final class BusiLineConfigModel implements IConfigPOBase<BusiLinePO> {
 
     @XStreamAsAttribute
     public String id;
@@ -51,11 +51,6 @@ public class BusiLineConfigModel implements IConfigPOBase<BusiLinePO> {
 
     @Override
     public BusiLinePO find(String key) {
-        return null;
-    }
-
-    @Override
-    public BusiLinePO findAll(Map<String, String> conditions) {
         return null;
     }
 
