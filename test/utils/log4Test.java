@@ -15,7 +15,7 @@ public class log4Test extends TestCase {
         /**
          * 加载log4配置
          */
-        PropertyConfigurator.configure(PlatGlobal.instance().getProjectRootPath() + "/sysConfig/log4.properties");
+        PropertyConfigurator.configure(PlatGlobal.instance().getProjectRootPath() + "/sysProperties/log4.properties");
     }
 
     public void testDebug() {

@@ -1,3 +1,5 @@
-out
 .idea
+out
 logs
+test/utils/protostuffXmlTest.java
+test/*.xml
