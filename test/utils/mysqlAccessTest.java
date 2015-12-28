@@ -1,8 +1,8 @@
 package utils;
 
+import dao.converter.impl.SmartStructConverter;
 import dao.impl.MySqlDbAccess;
 import dao.po.DBParam;
-import dao.po.EDriverType;
 import dao.po.EParamType;
 import dao.po.SmartStruct;
 import junit.framework.TestCase;
@@ -31,13 +31,13 @@ public class mysqlAccessTest extends TestCase {
     }
 
     public void testQuery() throws Exception {
-        MySqlDbAccess mySqlAccess = new MySqlDbAccess(EDriverType.MYSQL);
+        MySqlDbAccess mySqlAccess = MySqlDbAccess.getInstance();
 
         String sql = "select id,name,desp from t_busi_app where id = ?";
 
         SmartStruct s = mySqlAccess.query(sql, new DBParam[]{
                 new DBParam(EParamType.STRING, "1")
-        });
+        }, SmartStructConverter.getInstance());
 
         System.out.println(s);
 
@@ -54,7 +54,7 @@ public class mysqlAccessTest extends TestCase {
     }
 
     public void testExec() throws Exception {
-        MySqlDbAccess mySqlAccess = new MySqlDbAccess(EDriverType.MYSQL);
+        MySqlDbAccess mySqlAccess = MySqlDbAccess.getInstance();
 
         String sql = "update t_busi_app set name = ? where id = ?";
 
@@ -67,7 +67,7 @@ public class mysqlAccessTest extends TestCase {
     }
 
     public void testBatchExec() throws Exception {
-        MySqlDbAccess mySqlAccess = new MySqlDbAccess(EDriverType.MYSQL);
+        MySqlDbAccess mySqlAccess = MySqlDbAccess.getInstance();
 
         Map<String, DBParam[]> maps = new HashMap<>();
 
@@ -87,7 +87,7 @@ public class mysqlAccessTest extends TestCase {
     }
 
     public void testRepeatBatchExec() throws Exception {
-        MySqlDbAccess mySqlAccess = new MySqlDbAccess(EDriverType.MYSQL);
+        MySqlDbAccess mySqlAccess = MySqlDbAccess.getInstance();
 
         String sql = "update t_busi_app set name = ? where id = ?";
 

@@ -2,6 +2,8 @@ package dao;
 
 import dao.converter.IResultSetConverter;
 import dao.converter.impl.SmartStructConverter;
+import dao.eachHandler.IEachHandler;
+import dao.eachHandler.impl.DefaultEachHandler;
 import dao.po.DBParam;
 import dao.po.EDriverType;
 
@@ -16,32 +18,20 @@ import java.util.Map;
  */
 public abstract class BaseDbAccess<T> implements IDbAccess<T> {
 
-    private static IResultSetConverter DEFAULT_CONVERTER = new SmartStructConverter();
+    private static IResultSetConverter DEFAULT_CONVERTER = SmartStructConverter.getInstance();
+    private static IEachHandler DEFAULT_EACHHANDLER = DefaultEachHandler.getInstance();
+
     protected Connection connection;
     private EDriverType eDriverType;
     private int batchSize;
-    private IResultSetConverter resultSetConverter;
 
     protected BaseDbAccess(EDriverType eDriverType) {
-        this(eDriverType, 1000, DEFAULT_CONVERTER);
-    }
-
-    protected BaseDbAccess(EDriverType eDriverType, IResultSetConverter resultSetConverter) {
-        this(eDriverType, 1000, resultSetConverter);
+        this(eDriverType, 1000);
     }
 
     protected BaseDbAccess(EDriverType eDriverType, int batchSize) {
-        this(eDriverType, batchSize, DEFAULT_CONVERTER);
-    }
-
-    protected BaseDbAccess(EDriverType eDriverType, int batchSize, IResultSetConverter resultSetConverter) {
         this.eDriverType = eDriverType;
         this.batchSize = batchSize;
-        this.resultSetConverter = resultSetConverter == null ? DEFAULT_CONVERTER : resultSetConverter;
-
-//        Type genType = getClass().getGenericSuperclass();
-//        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
-//        entityClass = (Class) params[0];
     }
 
     /**
@@ -130,7 +120,6 @@ public abstract class BaseDbAccess<T> implements IDbAccess<T> {
         }
     }
 
-    protected abstract void eachResultSet(ResultSet set);
 
     /**
      * 执行数据查询
@@ -140,7 +129,7 @@ public abstract class BaseDbAccess<T> implements IDbAccess<T> {
      * @return
      */
     @Override
-    public T query(String sql, DBParam[] dbParams) {
+    public ResultSet query(String sql, DBParam[] dbParams) {
         connection = ConnectionManager.getConnection(eDriverType);
         PreparedStatement preparedStatement = null;
         ResultSet set = null;
@@ -151,7 +140,45 @@ public abstract class BaseDbAccess<T> implements IDbAccess<T> {
                 setValueToPreparedStatement(preparedStatement, i + 1, dbParams[i]);
             }
             set = preparedStatement.executeQuery();
-            return (T) resultSetConverter.convert(set);
+            return set;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (set != null) {
+                    set.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            ConnectionManager.close(connection);
+        }
+    }
+
+    /**
+     * 执行数据查询
+     * @param sql
+     * @param dbParams
+     * @return
+     */
+    @Override
+    public T query(String sql, DBParam[] dbParams, IResultSetConverter<T> resultSetConverter) {
+        connection = ConnectionManager.getConnection(eDriverType);
+        PreparedStatement preparedStatement = null;
+        ResultSet set = null;
+        if (resultSetConverter == null) resultSetConverter = DEFAULT_CONVERTER;
+        try {
+            preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            for (int i = 0, l = dbParams.length; i < l; i++) {
+                setValueToPreparedStatement(preparedStatement, i + 1, dbParams[i]);
+            }
+            set = preparedStatement.executeQuery();
+            return resultSetConverter.convert(set);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -176,10 +203,13 @@ public abstract class BaseDbAccess<T> implements IDbAccess<T> {
      * @param sql
      * @param dbParams
      */
-    public void eachQuery(String sql, DBParam[] dbParams) {
+    public void eachQuery(String sql, DBParam[] dbParams, IEachHandler eachHandler) {
         connection = ConnectionManager.getConnection(eDriverType);
         PreparedStatement preparedStatement = null;
         ResultSet set = null;
+        if (eachHandler == null) {
+            eachHandler = DEFAULT_EACHHANDLER;
+        }
         try {
             preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
             preparedStatement.setFetchSize(Integer.MIN_VALUE);
@@ -187,7 +217,9 @@ public abstract class BaseDbAccess<T> implements IDbAccess<T> {
                 setValueToPreparedStatement(preparedStatement, i + 1, dbParams[i]);
             }
             set = preparedStatement.executeQuery();
-            eachResultSet(set);
+            while (set.next()) {
+                eachHandler.each(set);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {

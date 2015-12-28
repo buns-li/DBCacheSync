@@ -15,7 +15,14 @@ import java.util.Map;
  * <p/>
  * 将ResultSet转换成SmartStruct
  */
-public class SmartStructConverter implements IResultSetConverter<SmartStruct> {
+public final class SmartStructConverter implements IResultSetConverter<SmartStruct> {
+
+    private SmartStructConverter() {
+    }
+
+    public static SmartStructConverter getInstance() {
+        return SingletonHolder.instance;
+    }
 
     @Override
     public SmartStruct convert(ResultSet resultSet) {
@@ -92,5 +99,9 @@ public class SmartStructConverter implements IResultSetConverter<SmartStruct> {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static class SingletonHolder {
+        public final static SmartStructConverter instance = new SmartStructConverter();
     }
 }
