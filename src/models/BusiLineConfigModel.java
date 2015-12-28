@@ -147,7 +147,7 @@ public class BusiLineConfigModel implements IConfigPOBase<BusiLinePO> {
 
                 ExtendedHierarchicalStreamWriterHelper.startNode(writer, "node", value.getClass());
 
-                writer.addAttribute("name", value.getType());
+                writer.addAttribute("name", value.getName());
                 writer.addAttribute("id", value.getId());
                 writer.addAttribute("next", value.getNext());
 
