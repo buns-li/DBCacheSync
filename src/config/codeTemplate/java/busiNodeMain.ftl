@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
-*<#if creator == "">@Created by Administrator on ${createTime} <#elseif creater!="">@Created by  ${creater} on ${createTime}</#if>
+*
 * 封装参数
 * 封装对象
 * 封装数据库操作
@@ -42,6 +42,6 @@ public class ${className} extends BaseNode {
         /**
          * 逻辑代码编写区域
          */
-        <#if !isEmpty><#include logicTemplatePath></#if>
+        <#if isEmpty><#include logicTemplatePath></#if>
     }
 }

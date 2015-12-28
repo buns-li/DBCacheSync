@@ -36,8 +36,8 @@ public class MqServerTest {
 
             //压缩包类型dev,prod
 
-            String routing_keys = "test.result";
-            String idAll = "1000:1001:11111,11110";
+            String routing_keys = "code.createLine";
+            String idAll = "1000:1001";
 
             channel.basicPublish(EXCHANGE_NAME, routing_keys, null, idAll
                     .getBytes());
