@@ -3,5 +3,14 @@
         <sql key="cache:app-query">
             <cmd>select * from t_busi_app;</cmd>
         </sql>
+        <sql key="code:node-query">
+            <cmd>select className from t_busi_node where id=?</cmd>
+        </sql>
+        <sql key="code:line-query">
+            <cmd>select r.nodeid,t.className from r_line_node r LEFT JOIN t_busi_node t on r.nodeid=t.id where r.lineId=?</cmd>
+        </sql>
+        <sql key="code:app-query">
+            <cmd>select l.id,r.nodeid,n.className from t_busi_line l LEFT JOIN r_line_node r on r.lineid=l.id LEFT JOIN t_busi_node n on n.id=r.nodeid where l.appId=?</cmd>
+        </sql>
     </sqls>
 </querylogic>
